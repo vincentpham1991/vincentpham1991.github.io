@@ -1,75 +1,71 @@
-# main text of home
-name: John Doe
-bio: 'A Man who travels the world eating noodles'
+# Site wide configuration
 
-# if it's an external image, update below for true
-external-image: false
-picture: 'assets/images/profile.jpg'
+title: Site Title
+locale: en_US
+description: Describe your website here.
+logo: site-logo.png
+search: true
+url: http://localhost:4000
 
-url: http://sergiokopplin.github.io/indigo
-# your url: http://USERNAME.github.io
+# Jekyll configuration
 
-permalink: /:title/
-
-markdown: kramdown
+permalink:   /:categories/:title/
+markdown:    kramdown
 highlighter: rouge
-
-analytics-google: 'UA-MYANALYTICS'
-
-# if you don't want comments in your posts, set to false
-disqus: mydisqus
-
-# if you don't have any of social below, comment the line
-facebook: myfacebook
-twitter: mytwitter
-# google: mygoogle
-# instagram: myinstagram
-# pinterest: mypinterest
-linkedin: mylinkedin
-youtube: myyoutube
-spotify: myspotify
-github: mygithub
-medium: medium
-email: myemail@gmail.com
-
-# do you want a larger site? change the option below
-# options: [normal, large] | default: normal
-# normal = 560px / large = 810px
-width: normal
-
-# if you don't need pagination, comment the *paginate* configs below
-# paginate: 5
-# paginate_path: "blog/:num/"
-
-# if you don't need projects, comment the *projects* configs below
-projects: true
-
-# if you don't need "about" or "blog", comment them out below
-about: true
-blog: true
-
-# do you want to show the "read time" of the posts?
-read-time: true
-
-# do you want to show the "tags" inside the posts?
-show-tags: true
-
-# related posts inside a post?
-related: true
-
-# do you want some animations?
-animation: true
-
+sass:
+  sass_dir: _sass
+  style: compressed
 gems:
-  - jemoji
-  - jekyll-mentions
-  - jekyll-seo-tag
-  - jekyll-feed
   - jekyll-sitemap
   - jekyll-gist
-  - jekyll-paginate
 
-jekyll-mentions:
-    base_url: https://github.com
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..2
+  enable_coderay: false
 
-exclude: [README.md, Gemfile, Gemfile.lock, node_modules, gulpfile.js, package.json, _site, src, vendor, CNAME, indigo-gh-pages.zip, Rakefile, screen-shot.png, travis.sh]
+mathjax: true
+
+include: [".htaccess"]
+exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "vendor"]
+
+
+# Octopress
+
+# Default extensions
+post_ext: md
+page_ext: md
+
+# Found in _templates/
+post_layout: post
+page_layout: page
+
+# Format titles with titlecase?
+titlecase: true
+
+
+# Site owner
+owner:
+  name: Your Name
+  avatar: bio-photo.jpg
+  email: you@email.com
+  disqus-shortname:
+  twitter: #username
+  facebook: #username
+  github: #username
+  stackexchange: #http://stackoverflow.com/users/123456/username
+  linkedin: #username
+  instagram: #username
+  flickr: #username
+  tumblr: #username
+  pinterest: #username
+  weibo: #userid
+  google:
+    plus: #username
+    analytics:
+    verify:
+    ad-client:
+    ad-slot:
+  bing-verify:
