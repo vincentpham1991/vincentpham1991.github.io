@@ -4,9 +4,10 @@ title: Vincent Pham
 locale: en_US
 description: "Data Scientist"
 logo: site-logo.png
+logo2: msan-student-vincent-pham.jpg
 search: true
-url: http://vincentpham1991.github.io
-#url: http://localhost:4000
+#url: http://vincentpham1991.github.io
+url: http://localhost:4000
 
 # Jekyll configuration
 
