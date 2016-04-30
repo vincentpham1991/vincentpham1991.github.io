@@ -98,6 +98,24 @@ display: none;
 			</figure>
 		</a>
 	</li>
+	<li>
+		<a href="https://bl.ocks.org/vincentpham1991/raw/bdde5f0ad54449717bacbf75b6eeee96/">
+			<figure>
+				<img src="{{ site.url }}/images/usa.png" alt="image"></a>
+				<figcaption><p>Travels in the USA</p></figcaption>
+			</figure>
+		</a>
+	</li>
+	<li>
+		<a href="https://bl.ocks.org/vincentpham1991/raw/af5d0b6148cf3c21b598c48cc9466017/">
+			<figure>
+				<img src="{{ site.url }}/images/greece.png" alt="image"></a>
+				<figcaption><p>Travels in Greece</p></figcaption>
+			</figure>
+		</a>
+	</li>
+
+
 <!-- 	<li>
 		<a href="https://github.com/CaptainDataCrunch/ObjectDetection">
 			<figure>
