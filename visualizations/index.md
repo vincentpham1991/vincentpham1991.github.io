@@ -99,7 +99,6 @@ display: none;
 		</a>
 	</li>
 	<li>
-	<li>
 		<a href="https://bl.ocks.org/vincentpham1991/raw/c8b452c9423c35edf688c0a0a4066b69/">
 			<figure>
 				<img src="{{ site.url }}/images/public_school.png" alt="image"></a>
