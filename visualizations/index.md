@@ -91,6 +91,15 @@ display: none;
 
 <ul class="photo-grid">
 	<li>
+		<a href="https://bl.ocks.org/vincentpham1991/raw/17c24b477a6eefb5bdc42f4c91bfc99c/">
+			<figure>
+				<img src="{{ site.url }}/images/startup.png" alt="image"></a>
+				<figcaption><p>Startups</p></figcaption>
+			</figure>
+		</a>
+	</li>
+	<li>
+	<li>
 		<a href="https://bl.ocks.org/vincentpham1991/raw/c8b452c9423c35edf688c0a0a4066b69/">
 			<figure>
 				<img src="{{ site.url }}/images/public_school.png" alt="image"></a>
