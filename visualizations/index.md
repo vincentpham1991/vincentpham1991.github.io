@@ -91,7 +91,7 @@ display: none;
 
 <ul class="photo-grid">
 	<li>
-		<a href="https://bl.ocks.org/vincentpham1991/raw/17c24b477a6eefb5bdc42f4c91bfc99c/">
+		<a href="{{ site.url }}/blog/CrunchBase">
 			<figure>
 				<img src="{{ site.url }}/images/startup.png" alt="image"></a>
 				<figcaption><p>Startups</p></figcaption>
@@ -99,7 +99,7 @@ display: none;
 		</a>
 	</li>
 	<li>
-		<a href="https://bl.ocks.org/vincentpham1991/raw/c8b452c9423c35edf688c0a0a4066b69/">
+		<a href="{{ site.url }}/blog/CPS">
 			<figure>
 				<img src="{{ site.url }}/images/public_school.png" alt="image"></a>
 				<figcaption><p>Chicago Public High School</p></figcaption>
@@ -107,7 +107,7 @@ display: none;
 		</a>
 	</li>
 	<li>
-		<a href="https://bl.ocks.org/vincentpham1991/raw/bdde5f0ad54449717bacbf75b6eeee96/">
+		<a href="{{ site.url }}/blog/USATravels">
 			<figure>
 				<img src="{{ site.url }}/images/usa.png" alt="image"></a>
 				<figcaption><p>Travels in the USA</p></figcaption>
@@ -115,7 +115,7 @@ display: none;
 		</a>
 	</li>
 	<li>
-		<a href="https://bl.ocks.org/vincentpham1991/raw/af5d0b6148cf3c21b598c48cc9466017/">
+		<a href="{{ site.url }}/blog/GreeceTravels">
 			<figure>
 				<img src="{{ site.url }}/images/greece.png" alt="image"></a>
 				<figcaption><p>Travels in Greece</p></figcaption>
