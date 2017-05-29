@@ -93,7 +93,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/DeepLearningTechniques">
 			<figure>
-				<img src="{{ site.url }}/images/woof_meow.jpg" alt="image"></a>
+				<img src="{{ site.url }}/images/woof_meow.jpg" alt="image">
 				<figcaption><p>Deep Learning Techniques</p></figcaption>
 			</figure>
 		</a>
@@ -101,7 +101,7 @@ display: none;
     <li>
         <a href="{{ site.url }}/blog/NeuralStyle">
             <figure>
-                <img src="{{ site.url }}/images/neuralStyleCombo.png" alt="image"></a>
+                <img src="{{ site.url }}/images/neuralStyleCombo.png" alt="image">
                 <figcaption><p>Neural Style Transfer</p></figcaption>
             </figure>
         </a>
@@ -109,7 +109,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/GANs">
 			<figure>
-				<img src="{{ site.url }}/images/GAN_food.png" alt="image"></a>
+				<img src="{{ site.url }}/images/GAN_food.png" alt="image">
 				<figcaption><p>GANs</p></figcaption>
 			</figure>
 		</a>
