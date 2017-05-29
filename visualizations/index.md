@@ -93,7 +93,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/CrunchBase">
 			<figure>
-				<img src="{{ site.url }}/images/startup.png" alt="image"></a>
+				<img src="{{ site.url }}/images/startup.png" alt="image">
 				<figcaption><p>Startups</p></figcaption>
 			</figure>
 		</a>
@@ -101,7 +101,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/CPS">
 			<figure>
-				<img src="{{ site.url }}/images/public_school.png" alt="image"></a>
+				<img src="{{ site.url }}/images/public_school.png" alt="image">
 				<figcaption><p>Chicago Public High School</p></figcaption>
 			</figure>
 		</a>
@@ -109,7 +109,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/USATravels">
 			<figure>
-				<img src="{{ site.url }}/images/usa.png" alt="image"></a>
+				<img src="{{ site.url }}/images/usa.png" alt="image">
 				<figcaption><p>Travels in the USA</p></figcaption>
 			</figure>
 		</a>
@@ -117,7 +117,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/GreeceTravels">
 			<figure>
-				<img src="{{ site.url }}/images/greece.png" alt="image"></a>
+				<img src="{{ site.url }}/images/greece.png" alt="image">
 				<figcaption><p>Travels in Greece</p></figcaption>
 			</figure>
 		</a>

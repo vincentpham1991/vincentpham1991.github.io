@@ -93,7 +93,7 @@ display: none;
 	<li>
 		<a href="https://github.com/reddit-analyzer/data_acq">
 			<figure>
-				<img src="{{ site.url }}/images/reddit.jpg" alt="image"></a>
+				<img src="{{ site.url }}/images/reddit.jpg" alt="image">
 				<figcaption><p>Data Mining of Reddit</p></figcaption>
 			</figure>
 		</a>
@@ -101,7 +101,7 @@ display: none;
 	<li>
 		<a href="https://github.com/CaptainDataCrunch/ObjectDetection">
 			<figure>
-				<img src="{{ site.url }}/images/car_adaboost.png" alt="image"></a>
+				<img src="{{ site.url }}/images/car_adaboost.png" alt="image">
 				<figcaption><p>Car Detection Using Adaboost</p></figcaption>
 			</figure>
 		</a>
@@ -109,7 +109,7 @@ display: none;
 	<li>
 		<a href="https://github.com/vincentpham1991/titanic/blob/master/Vincent_Spark_tutorial.ipynb">
 			<figure>
-				<img src="{{ site.url }}/images/titanic.png" alt="image"></a>
+				<img src="{{ site.url }}/images/titanic.png" alt="image">
 				<figcaption><p>Spark Tutorial with Titanic Data</p></figcaption>
 			</figure>
 		</a>
@@ -117,7 +117,7 @@ display: none;
 	<li>
 		<a href="{{ site.url }}/blog/LoanProsper">
 			<figure>
-				<img src="{{ site.url }}/images/prosper.png" alt="image"></a>
+				<img src="{{ site.url }}/images/prosper.png" alt="image">
 				<figcaption><p>Exploratory Analysis of Loan Data</p></figcaption>
 			</figure>
 		</a>
@@ -125,7 +125,7 @@ display: none;
 	<li>
 		<a href="https://github.com/vincentpham1991/SentimentAnalysis">
 			<figure>
-				<img src="{{ site.url }}/images/movie.jpg" alt="image"></a>
+				<img src="{{ site.url }}/images/movie.jpg" alt="image">
 				<figcaption><p>Sentiment Analysis of Movie Reviews</p></figcaption>
 			</figure>
 		</a>
@@ -133,7 +133,7 @@ display: none;
 	<li>
 		<a href="https://github.com/vincentpham1991/PythonProjects/tree/master/StocksHeatMap">
 			<figure>
-				<img src="{{ site.url }}/images/stocks2.jpg" height="180" width="320" alt="image"></a>
+				<img src="{{ site.url }}/images/stocks2.jpg" height="180" width="320" alt="image">
 				<figcaption><p> Heat Map of Stock Correlations</p></figcaption>
 			</figure>
 		</a>
