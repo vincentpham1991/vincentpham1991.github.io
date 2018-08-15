@@ -4,7 +4,7 @@ title: "Greece Travels"
 modified:
 categories: blog
 excerpt:
-tags: []
+tags: [Maps]
 image:
   feature:
 date: 2016-08-18T15:39:55-04:00

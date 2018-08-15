@@ -4,7 +4,7 @@ title: "Neural Style Transfer"
 modified:
 categories: blog
 excerpt:
-tags: []
+tags: [AI]
 image:
   feature:
 date: 2017-05-28T15:39:55-04:00

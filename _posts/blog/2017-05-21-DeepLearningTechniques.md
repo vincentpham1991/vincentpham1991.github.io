@@ -4,7 +4,7 @@ title: "Deep Learning Techniques"
 modified:
 categories: blog
 excerpt:
-tags: []
+tags: [AI]
 image:
   feature:
 date: 2017-05-21T15:39:55-04:00
