@@ -107,6 +107,14 @@ display: none;
 		</a>
 	</li>
 	<li>
+		<a href="{{ site.url }}/blog/WorldTravels">
+			<figure>
+				<img src="{{ site.url }}/images/world.png" alt="image">
+				<figcaption><p>Travels</p></figcaption>
+			</figure>
+		</a>
+	</li>
+	<li>
 		<a href="{{ site.url }}/blog/USATravels">
 			<figure>
 				<img src="{{ site.url }}/images/usa.png" alt="image">
