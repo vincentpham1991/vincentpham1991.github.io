@@ -5,8 +5,6 @@ modified:
 categories: blog
 excerpt:
 tags: [Guide]
-image:
-  feature:
 date: 2018-08-13T15:39:55-04:00
 ---
 

@@ -5,8 +5,6 @@ modified:
 categories: blog
 excerpt:
 tags: [Maps]
-image:
-  feature:
 date: 2018-08-16T15:39:55-04:00
 ---
 

@@ -53,7 +53,7 @@ modified: 2017-05-21T19:44:38.564948-04:00
 	opacity: 0;
 	position: absolute;
 	right: 0;
-	top: 0;
+	top: -9px;
 	transition: all 300ms;
 	transition-delay: 100ms;
 	width: 100%;

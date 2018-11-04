@@ -5,8 +5,6 @@ modified:
 categories: blog
 excerpt:
 tags: [AI]
-image:
-  feature:
 date: 2017-05-28T15:39:55-04:00
 ---
 
