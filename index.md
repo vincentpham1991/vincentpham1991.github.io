@@ -12,3 +12,4 @@ Currently, I am working as a Data Scientist at Capital One. I have a MS in Analy
 Feel free to contact me if you have any questions that I may be able to answer. If you have not seen my [project portfolio](http://vincentpham1991.github.io/projects/) yet, check it out. 
 
 
+More contents to be updated soon!
