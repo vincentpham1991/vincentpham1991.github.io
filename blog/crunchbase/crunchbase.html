@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-queue.v2.min.js"></script>
+
+
+<style type="text/css">
+
+svg {
+  font: 10px sans-serif;
+  float: left;
+
+}
+
+.area {
+  fill: lightgray;
+  clip-path: url(#clip);
+}
+
+.area2 {
+  fill: orange;
+  clip-path: url(#clip);
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+  clip-path: url(#clip);
+}
+
+rect.pane {
+/*  cursor: move;
+*/  fill: none;
+/*  pointer-events: all;
+*/}
+
+.tooltip {
+  position: absolute;
+/*  width: 200px;
+  height: 28px;*/
+  pointer-events: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<script type="text/javascript">
+function draw(error, files) {
+
+  //set margins
+  var margin = {top: 10, right: -10, bottom: 100, left: 40},
+      margin2 = {top: 330, right: -10, bottom: 20, left: 40},
+      width = 600 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom,
+      height2 = 400 - margin2.top - margin2.bottom;
+
+  //Add header
+  d3.select("body")
+    .append("h1")
+    .text("Startup Material at Round 1 (as of October 2013)")
+    .attr('class', 'title')
+    .style('position','relative')
+    .style('left','20%')
+    .style('margin-right','20%');
+
+  //parse date
+  var parseDate = d3.time.format("%b-%Y").parse;
+
+
+  var data = files[0];
+  data.forEach(function(d) {
+          d.date = parseDate(d.date);
+          d.count = +d.count;
+  });
+
+
+  //set x and y values
+  var x = d3.time.scale().range([0, width]),
+      x2 = d3.time.scale().range([0, width]),
+      y = d3.scale.linear().range([height, 0]),
+      y2 = d3.scale.linear().range([height2, 0]);
+
+  // axis values
+  var xAxis = d3.svg.axis().scale(x).orient("bottom"),
+      xAxis2 = d3.svg.axis().scale(x2).orient("bottom"),
+      yAxis = d3.svg.axis().scale(y).orient("left");
+
+  var brush = d3.svg.brush()
+      .x(x2)
+      .on("brush", brushed);
+
+  var area = d3.svg.area()
+      .interpolate("monotone")
+      .x(function(d) { return x(d.date); })
+      .y0(height)
+      .y1(function(d) { return y(d.count); });
+
+  var area2 = d3.svg.area()
+      .interpolate("monotone")
+      .x(function(d) { return x2(d.date); })
+      .y0(height2)
+      .y1(function(d) { return y2(d.count); });
+
+  //set width and height of svg
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+  //plot stays within boundary when changing time 
+  svg.append("defs").append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
+  var focus = svg.append("g")
+      .attr("class", "focus")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var context = svg.append("g")
+      .attr("class", "context")
+      .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+  var zoom = d3.behavior.zoom()
+      .on("zoom", draw_area);
+
+  // Add rect cover the zoomed graph and attach zoom event.
+  var rect = svg.append("svg:rect")
+      .attr("class", "pane")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(zoom);
+
+  x.domain(d3.extent(data.map(function(d) { return d.date; })));
+  y.domain([0, d3.max(data.map(function(d) { return d.count; }))]);
+  x2.domain(x.domain());
+  y2.domain(y.domain());
+
+  // Set up zoom behavior
+  zoom.x(x);
+
+  //Top graph
+  focus.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area);
+
+    focus.append("text")
+      .attr("x", (width / 2))             
+      .attr("y", 10 - (margin.top / 2))
+      .attr("text-anchor", "middle")  
+      .style("font-size", "14px") 
+      //.style("text-decoration", "underline")  
+      .text("Companies Starting Up");
+
+
+  focus.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  focus.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Total First Investment Round");
+
+  //Bottom graph
+  context.append("path")
+      .datum(data)
+      .attr("class", "area2")
+      .attr("d", area2);
+
+  context.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height2 + ")")
+      .call(xAxis2);
+
+  context.append("g")
+      .attr("class", "x brush")
+      .call(brush)
+    .selectAll("rect")
+      .attr("y", -6)
+      .attr("height", height2 + 7);
+
+  context.append("text")
+    .attr("x", 50 + margin2.left)             
+    .attr("y", 40 - (margin.top))
+    .attr("text-anchor", "middle")  
+    .attr("fill","red")
+
+    .style("font-size", "14px") 
+    //.style("text-decoration", "underline")  
+    .text("Interactive windowing here ->");
+
+
+  function brushed() {
+    x.domain(brush.empty() ? x2.domain() : brush.extent());
+    focus.select(".area").attr("d", area); //windows on bottom causes the plot on top to move
+    focus.select(".x.axis").call(xAxis); //windows in bottom causes x domain to change 
+    // Reset zoom scale's domain
+    zoom.x(x);
+    scatterplot(x.domain()[0], x.domain()[1])
+    barchart(x.domain()[0], x.domain()[1])
+  }
+
+  function draw_area() {
+    //Prevents the top from moving
+    
+    //focus.select(".area").attr("d", area);
+    //focus.select(".x.axis").call(xAxis);
+
+    // Force changing brush range
+    brush.extent(x.domain());
+    svg.select(".brush").call(brush);
+  }
+
+  function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  files[1].forEach(function(d) {
+    d.rank1 = +d.rank1;
+    d.rank2 = +d.rank2;
+    d.mth_yr = parseDate(d.mth_yr)
+    d.inv1 = numberWithCommas(d.inv1)
+    d.inv2 = numberWithCommas(d.inv2);
+   });
+
+  //Draw Chart plot
+  function scatterplot(lower_bound, upper_bound) {
+    d3.select("#scatter").remove();
+    d3.select("#barchart").remove();
+
+    data2 = files[1]
+    var margin = {top: 10, right: -10, bottom: 20, left: 40},
+        width = 400 - margin.left - margin.right,
+        height = 200 - margin.top - margin.bottom;
+
+
+    var x3 = d3.scale.linear().range([0, width]),
+        y3 = d3.scale.linear().range([height, 0]);
+
+    x3.domain(d3.extent(data2, function(d) { return d.rank1; }));
+    y3.domain(d3.extent(data2, function(d) { return d.rank2; }));
+
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+
+    data2 = data2.filter(function(d) {
+        return d.mth_yr > lower_bound && d.mth_yr < upper_bound;
+    })
+
+    var svg = d3.select("body")
+      .append("svg")
+        .attr("id","scatter")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xAxis3 = d3.svg.axis().scale(x3).orient("bottom"),
+        yAxis3 = d3.svg.axis().scale(y3).orient("left");
+
+    var scatter = svg.append("g")
+        .attr("class", "scatter")
+        .attr("id","scatter");
+
+    scatter.append("text")
+            .attr("x",80)             
+            .attr("y", 12 - (margin.top))
+            .attr("text-anchor", "middle")  
+            .style("font-size", "14px") 
+            .text("Seed Rounds");
+
+    scatter.append("text")
+      .attr("x",180)             
+      .attr("y", 12 - (margin.top))
+      .attr("text-anchor", "middle")
+      .attr("fill","red")  
+      .style("font-size", "14px") 
+      .text("(hoverable)");
+
+
+    scatter.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height+ ")")
+        .call(xAxis3)
+      .append("text")
+        .attr("class", "label")
+        .attr("x", 350)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text("Round 1 (in log $)");
+
+    scatter.append("g")
+        .attr("class", "y axis")
+        .call(yAxis3)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Round 2 (in log $)")
+
+      scatter.selectAll("#scatter")
+        .data(data2)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) {
+          return x3(d.rank1);
+        })
+        .attr("cy", function(d) {
+          return y3(d.rank2);
+        })
+        .attr("r", 5)
+        .style("fill", function(d) {if (d.status == "operating") {return "#67C1EC"}
+              else if (d.status == "acquired")  { return "#E6B90D" }
+              else if (d.status == "ipo") {return "#5EBC4E"}
+              else if (d.status == "closed") {return "black"};}) //["operating", "acquired", "ipo", "closed"]
+        .style("opacity", 0.4) 
+        .on("mouseover", function(d) {      
+            tooltip.transition()        
+                 .duration(200)      
+                 .style("opacity", .9);      
+            tooltip.html("<font color = 'blue'>Company: </font>" + d.company_name + 
+                          "<br><br> <font color = 'blue'> Category: </font>" + d.company_category_code +
+                          "<br><br> <font color = 'blue'> Round 1 Investment Raised: </font>$" + d.inv1 +
+                          "<br><br> <font color = 'blue'> Round 2 Investment Raised: </font>$" + d.inv2)
+                 .style("left", "650px")     
+                 .style("top", "300px");
+
+            d3.select(this)
+              .transition()
+              .duration(10)
+              .style('fill','red');    
+        })   
+        .on("mouseout", function(d) {       
+            tooltip.transition()        
+               .duration(500)      
+               .style("opacity", 0);   
+
+            d3.select(this)
+              .transition()
+              .duration(10)
+              .style("fill", function(d) {if (d.status == "operating") {return "#67C1EC"}
+                else if (d.status == "acquired")  { return "#E6B90D" }
+                else if (d.status == "ipo") {return "#5EBC4E"}
+                else if (d.status == "closed") {return "black"};}); 
+        });
+
+      // draw legend
+      var legend = svg.selectAll(".legend")
+          .data(["operating", "acquired", "ipo", "closed"])
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 12 + ")"; });
+
+      // draw legend colored rectangles
+      legend.append("rect")
+          .attr("x", width - 18)
+          .attr("y", 96)
+          .attr("width", 10)
+          .attr("height", 10)
+          .style("fill", function(d) {if (d == "operating") {return "#67C1EC"}
+                else if (d == "acquired")  { return "#E6B90D" }
+                else if (d == "ipo") {return "#5EBC4E"}
+                else if (d == "closed") {return "black"};});
+
+      // draw legend text
+      legend.append("text")
+          .attr("x", width - 24)
+          .attr("y", 100)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d;})
+
+    };  
+  scatterplot(x.domain()[0], x.domain()[1])
+
+  files[2].forEach(function(d) {
+    d.has_second = +d.has_second;
+    d.no_second = +d.no_second;
+    d.mth_yr = parseDate(d.mth_yr);
+   });
+
+  //Draw Chart plot
+  function barchart(lower_bound, upper_bound) {
+    d3.select("#bar").remove();
+
+    data3 = files[2]
+
+    data3 = data3.filter(function(d) {
+        return d.mth_yr > lower_bound && d.mth_yr < upper_bound;
+    })
+
+    var second_round = 0;
+    var no_second = 0;
+
+    data3.forEach(function(d) {
+      second_round += d.has_second;
+      no_second += d.no_second;
+    });
+    var second_round_per = second_round / (second_round + no_second);
+    var no_second_per = no_second / (second_round + no_second);
+
+    var new_data = [{"id":"yes","freq":second_round_per},{"id":"no","freq":no_second_per}];
+
+    var margin = {top: 10, right: -10, bottom: 20, left: 70},
+        width = 200 - margin.left - margin.right,
+        height = 200 - margin.top - margin.bottom;
+
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    x.domain(["yes","no"]);
+    y.domain([0,1]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10, "%");
+
+
+    var svg = d3.select("body")
+      .append("svg")
+        .attr("id","barchart")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var barc = svg.append("g")
+        .attr("class", "barchart")
+        .attr("id","barchart");
+
+    barc.append("text")
+      .attr("x",75)             
+      .attr("y", 12 - (margin.top))
+      .attr("text-anchor", "middle")
+      .style("font-size", "14px") 
+      .text("Second Round");
+
+    barc.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    barc.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Frequency");
+
+    barc.selectAll(".bar")
+        .data(new_data)
+      .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d.id); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.freq); })
+        .attr("height", function(d) { return height - y(d.freq); })
+        .style("fill","maroon");
+
+  }
+  barchart(x.domain()[0], x.domain()[1])
+
+}
+</script>
+
+<script>
+  // load data with queue
+
+  var file1 = "cnts_per_date3.csv";
+  var file2 = "rounds_final.csv"; 
+  var file3 = "has_second.csv"
+
+  var q = d3_queue.queue(2)
+                  .defer(d3.csv,file1)
+                  .defer(d3.csv,file2)
+                  .defer(d3.csv,file3)
+                  .awaitAll(draw);
+
+</script>
+</body>
+</html>

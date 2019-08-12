@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+
+<style type="text/css">
+
+.land{
+    fill: rgba(0,0,0, 0.17);
+}
+
+.border{
+	stroke: rgba(0,0,0, 0.7);
+	fill: none;
+}
+
+path:hover {
+    fill-opacity:.7;
+}
+
+/* Style for Custom Tooltip */
+initialMessage.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 325px;
+    height: 40px;
+    padding: 2px;
+    font: 25px bold, sans-serif;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 200px;
+    height: 40px;
+    padding: 2px;
+    font: 30px bold, sans-serif;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+message.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 200px;
+    height: 40px;
+    padding: 2px;
+    font: 12px bold, sans-serif;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color: red;
+}
+
+</style>
+</head>
+<body>
+<script>
+// D3 Projection parameters
+var width = 960,
+    height = 500,
+    initRotation = [70, -20],
+    sensitivity = 0.25,
+    scaleExtent = [1, 8],
+    maxElevation = 45;
+
+// D3 Projection
+var projection = d3.geoOrthographic()
+                   .scale(250)
+                   .rotate(initRotation)
+                   .translate([width / 2, height / 2])
+                   .clipAngle(90);
+
+var path = d3.geoPath()
+             .projection(projection);
+
+// Define linear scale for color output of country visited
+var color = d3.scaleLinear()
+              .range(["rgb(213,222,217)","rgb(69,173,168)"]);
+
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .call(d3.drag()
+                    .subject(function () {
+                        var r = projection.rotate();
+                        return { x: r[0] / sensitivity, y: -r[1] / sensitivity };
+                    })
+                    .on("drag", dragged)
+            )
+            .call(d3.zoom()
+                    .scaleExtent(scaleExtent)
+                    .on("zoom", zoomed)
+            );
+
+// Append Div for tooltip to SVG
+var initialMessage = d3.select("body")
+                       .append("initialMessage")
+                       .attr("class", "tooltip")
+                       .style("opacity", 1)
+                       .text("DRAG THE GLOBE AND HOVER OVER THE COUNTRIES")
+                       .style("left", "0px")
+                       .style("top",  "0px");
+
+var div = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+var message = d3.select("body")
+                .append("message")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+
+//Drag Functions
+function dragged() {
+    var o1 = [d3.event.x * sensitivity, -d3.event.y * sensitivity];
+    o1[1] =
+        o1[1] > maxElevation
+            ? maxElevation
+            : o1[1] < -maxElevation
+                ? -maxElevation
+                : o1[1];
+    projection.rotate(o1);
+    refresh();
+}
+
+function zoomed() {
+  if (d3.event) {
+    svg.attr("transform", "scale(" + d3.event.transform.k + ")");
+  }
+}
+
+function refresh() {
+    svg.selectAll(".land").attr("d", path);
+    svg.selectAll(".border").attr("d", path);
+    svg.selectAll(".g").attr("d", path);
+}
+
+// Date Files
+var files = [d3.json("world-110m.json"),
+             d3.csv("world-country-names.csv")];
+
+Promise.all(files).then(mapData);
+
+// Create the Globe
+function mapData(data){
+    var world = data[0];
+    var country_names = data[1];
+    var countries = topojson.feature(world, world.objects.countries).features;
+    var borders = topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; });
+
+    // Assign the land colors ("visited")
+    color.domain([0,1]);
+
+    // Apply country data to json data
+    for (var i = 0; i < country_names.length; i++) {
+        var name = country_names[i].name;
+        var country_id = Number(country_names[i].id);
+        var visited = Number(country_names[i].visited);
+        var website = country_names[i].website;
+
+        for (var j = 0; j < countries.length; j++) {
+            var original_id = countries[j].id;
+
+            if (original_id === country_id) {
+                countries[j].properties.visited = visited;
+                countries[j].properties.name = name;
+                countries[j].properties.website = website;
+                break;
+            }
+        }
+    }
+
+    //Display the borders between countries
+    svg.append("path")
+     .datum(borders)
+     .attr("class", "border")
+     .attr("d", path);
+
+    // Apply land color, hover, and double click feature
+    svg.append("g")
+       .attr("class", "land")
+       .selectAll("path")
+       .data(countries)
+       .enter()
+       .append("path")
+       .attr("d", path)
+       .style("stroke", "#fff")
+       .style("stroke-width", "1")
+       .style("fill", function(d) {
+            // Get data value
+            var value = d.properties.visited;
+
+            if (value) {
+                return color(value);
+            } else {
+                return "rgb(213,222,217)";
+            }
+        })
+       .attr("class", "land")
+       .on("mouseover", function(d) {
+            initialMessage.transition()
+                          .duration(100)
+                          .style("opacity", 0);
+
+            div.transition()
+               .duration(200)
+               .style("opacity", 0.9);
+
+            div.text(d.properties.name)
+               .style("left", "0px")
+               .style("top",  "0px");
+
+            if (d.properties.website) {
+                message.transition()
+                       .duration(200)
+                       .style("opacity", 0.9);
+                       
+                message.text('Double Click for Country Map')
+                       .style("left", "0px")
+                       .style("top",  "300px");
+            }
+         })
+
+        // fade out tooltip on mouse out
+       .on("mouseout", function() {
+            div.transition()
+               .duration(500)
+               .style("opacity", 0);
+
+            message.transition()
+                   .duration(500)
+                   .style("opacity", 0);
+        })
+       .on("dblclick", function(d) {
+            var website = d.properties.website;
+            if(website){
+                window.open("http://vincentpham1991.github.io/blog/" + website, "_blank");
+            }
+        });
+}
+
+</script>
+</body>
+</html>

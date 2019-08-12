@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.12/d3.min.js"></script>
+    <style type="text/css">
+      body {
+        font-family: futura;
+      }
+
+      h2.title {
+        color: black;
+        text-align: left;
+      }
+
+      .axis {
+        font-family: arial;
+        font-size: 0.7em;
+      }
+
+      text {
+        fill: black;
+        stroke: none;
+      }
+
+      .label {
+        font-size: 2em;
+      }
+
+      path {
+        fill: none;
+        stroke: black;
+        stroke-width: 2px;
+      }
+
+      .tick {
+        fill: none;
+        stroke: black;
+      }
+
+      .circle {
+        opacity: 0.8;
+        stroke: blue;
+        fill: maroon;
+      }
+      .tooltip {
+        position: absolute;
+        width: 200px;
+        height: 28px;
+        pointer-events: none;
+      }
+      div.group_buttons {
+          text-align: left;
+        }
+
+      div.group_buttons div {
+        text-align: left;
+        background-color: #6ECDCD;
+        color: white;
+        padding: 6px;
+        margin: 4px;
+        font-size: 0.8em;
+        cursor: pointer;
+        display: inline-block;
+      }
+
+      div.group_buttons2 {
+        text-align: left;
+      }
+
+      div.group_buttons2 div {
+        text-align: left;
+        background-color: #438CCA;
+        color: white;
+        padding: 6px;
+        margin: 4px;
+        font-size: 0.8em;
+        cursor: pointer;
+        display: inline-block;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+      function draw(data) {
+          "use strict";
+          // set margins according to Mike Bostock's margin conventions
+          // http://bl.ocks.org/mbostock/3019563
+          var margin = {top: 25, right: 40, bottom: 120, left: 75};
+
+          // set height and width of chart
+          var width = 600 - margin.left - margin.right,
+              height = 700 - margin.top - margin.bottom;
+
+          // specify the radius of our circles and the
+          // column we want to plot
+          var yfield = 'lon';
+          var xfield = 'lat';
+
+          // Append the title for the graph
+          d3.select("body")
+              .append("h2")
+              .text("Chicago Public High School Data")
+              .attr('class', 'title');
+
+          // append the SVG tag with height and width to accommodate for margins
+          var svg = d3.select("body")
+                      .append("svg")
+                          .attr("width", width + margin.left + margin.right)
+                          .attr("height", height + margin.top + margin.bottom)
+                          .style('float','left')
+                      .append('g')
+                          .attr('class','chart')
+                          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                          ;
+
+          // remove missing values
+          data = data.filter(function(d) {
+            return d[yfield];
+          });
+
+        //var grouped = {'key':'group', 'selected':false, 'idx':2};
+        var butts = [{key:"individualize", selected:true,index:0},{key:"group",selected:false, index:1}];	
+
+        var buttons = d3.select("body")
+          .append("div")
+          .attr("class", "group_buttons")
+          .selectAll("div")
+          .data(butts)
+          .enter()
+          //.selectAll("div")
+          .append("div")
+          .text(function(d) {
+             return d.key;
+          })
+          .attr('id', function(d) {
+          // convert mm/dd to mm_dd for more readable #id
+          return 'd' + d.key;
+          });
+
+        var butts2 = [{key:"college_enrollment", selected:true,index:0},{key:"attendance",selected:false, index:1}, {key:"teacher_attendance", selected:false, index:2}, {key:"graduation",selected:false, index:3}, {key:"suspension",selected:false, index:4}, {key:"ACT",selected:false, index:5}];  
+
+        var buttons2 = d3.select("body")
+          .append("div")
+          .attr("class", "group_buttons2")
+          .selectAll("div")
+          .data(butts2)
+          .enter()
+          //.selectAll("div")
+          .append("div")
+          .text(function(d) {
+             return d.key;
+          })
+          .attr('id', function(d) {
+          // convert mm/dd to mm_dd for more readable #id
+          return 'd' + d.key;
+          });
+
+        // define a function to unselect all the buttons
+        var button_unhighlight = function() {
+          d3.select(".group_buttons")
+              .selectAll("div")
+              .datum(function(d) {
+                // change the internal state of each button to unselected
+                d.selected = false;
+                return d;
+              })
+              .transition()
+              .duration(500)
+              .style("color", "white")
+              .style("background", '#6ECDCD');
+        };
+
+        var button_unhighlight2 = function() {
+          d3.select(".group_buttons2")
+              .selectAll("div")
+              .datum(function(d) {
+                // change the internal state of each button to unselected
+                d.selected = false;
+                return d;
+              })
+              .transition()
+              .duration(500)
+              .style("color", "white")
+              .style("background", '#438CCA');
+        };
+
+        // highlight button with a specified id
+        var button_highlight = function(id) {
+          d3.select('#' + 'd' + id)
+          .datum(function(d) {
+                // change internal state to selected
+                d.selected = true;
+                return d;
+              })
+              .transition()
+              .duration(500)
+              .style("background", "#F7977A")
+              .style('color', 'black');
+        };
+
+        // Toggle the first button
+        d3.select('.group_buttons')
+              .select('div:first-child')
+                .transition()
+                .duration(500)
+                .style("background", "#F7977A")
+                .style('color', 'black');
+
+
+        d3.select('.group_buttons2')
+              .select('#dcollege_enrollment')
+                .transition()
+                .duration(500)
+                .style("background", "#F7977A")
+                .style('color', 'black');
+
+         // add hover to buttons
+        buttons.on('mouseover', function(d) {
+           if (!d.selected) {
+  
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("background", "#F7977A")
+              .style('color', 'black');
+          }
+        });
+
+        // add hover to buttons
+        buttons.on('mouseout', function(d) {
+          if (!d.selected) {
+           d3.select(this)
+              .transition()
+              .duration(500)
+              .style("color", "white")
+              .style("background", '#6ECDCD');
+          } else {
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("background", "#F7977A")
+              .style('color', 'black');
+          }
+        })
+
+        buttons2.on('mouseover', function(d) {
+           if (!d.selected) {
+  
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("background", "#F7977A")
+              .style('color', 'black');
+          }
+        });
+
+        // add hover to buttons
+        buttons2.on('mouseout', function(d) {
+          if (!d.selected) {
+           d3.select(this)
+              .transition()
+              .duration(500)
+              .style("color", "white")
+              .style("background", '#438CCA');
+          } else {
+            d3.select(this)
+              .transition()
+              .duration(500)
+              .style("background", "#F7977A")
+              .style('color', 'black');
+          }
+        })
+
+        // function to be run when on a clicked button
+        buttons.on("click", function(d) {
+          d.selected = true;
+
+          // update the bound data for this button
+          d3.select(this).datum(d);
+
+          // run our update function for the line chart
+          update(d.key);
+        });
+
+
+        buttons2.on("click", function(d) {
+          d.selected = true;
+
+          // update the bound data for this button
+          d3.select(this).datum(d);
+
+          // run our update function for the line chart
+          update2(d.key);
+        });
+        // function which updates the data bound to our chart
+        function update(key) {
+            // highlight buttons in sync with animation
+            button_unhighlight();
+            button_highlight(key);
+        };
+        function update2(key) {
+            // highlight buttons in sync with animation
+            button_unhighlight2();
+            button_highlight(key);
+        };
+
+        // add the tooltip area to the webpage
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        var var_color1 = 'coll_enr';
+
+
+        var color_individual = function(d) { return d[var_color1];},
+            color = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);
+
+        // bind our data to svg rects for the bar plot
+        svg.selectAll(".circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr('class', 'circle')
+            .style("fill", function(d) { return color(color_individual(d));}) 
+            .on("mouseover", function (d) {
+              tooltip.transition()
+                .duration(200)
+                .style("opacity", 1);
+              tooltip.html("<font color='blue'>School:</font><br>" + d["school"] + "<br><br><font color='blue'>College Enrollment Rate:</font><br>" + d["coll_enr"] + "%")
+                .style("left", width + 125  + "px")
+                .style("top", height - 250 + 'px');
+            })
+            .on("mouseout", function(d) {
+              tooltip.transition()
+                .duration(500)
+                .style("opacity",0);
+            });
+
+        // maximum y value
+        var max_y = d3.max(data, function(d) {
+            return +d[yfield];
+        });
+
+        // minimum y value
+        var min_y = d3.min(data, function(d) {
+            return +d[yfield];
+        });
+
+        // maximum x value
+        var max_x = d3.max(data, function(d) {
+            return +d[xfield];
+        });
+
+        // minimum x value
+        var min_x = d3.min(data, function(d) {
+            return +d[xfield];
+        });
+
+        // Create x-axis scale mapping dates -> pixels
+        var measure_scale_x = d3.scale.linear()
+            .range([0, width])
+            .domain([min_x, max_x]);
+
+        // Create y-axis scale mapping price -> pixels
+        var measure_scale = d3.scale.linear()
+            .range([height, 0])
+            .domain([min_y, max_y]);
+
+        var measure_axis_x = d3.svg.axis()
+            .scale(measure_scale_x)
+            .orient("bottom")
+            .ticks(5);
+ 
+        // Create D3 axis object from measure_scale for the y-axis
+        var measure_axis = d3.svg.axis()
+            .scale(measure_scale)
+            .orient("left");
+
+        //Append SVG to page corresponding to the D3 x-axis
+        svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', "translate(0," + height + ")")
+            .call(measure_axis_x);
+
+        // Append SVG to page corresponding to the D3 y-axis
+        svg.append('g')
+            .attr('class', 'y axis')
+            .call(measure_axis);
+
+            //add label to x-axis
+			var x_label = d3.select(".x.axis")
+			    .append("text")
+			    .attr('class', 'label')
+			    .text("Latitude")
+			    .style('font-size', '1.2em')
+
+			//center x axis label
+			x_label.attr("x", width/2).attr('y',40)
+			    .style("text-anchor", "middle");
+
+      // add label to y-axis
+      var y_label = d3.select(".y.axis")
+          .append("text")
+          .attr('class', 'label')
+          .text("Longitude")
+          .style('font-size', '1.2em')
+          .attr("transform", "rotate(-90)");
+
+      // center y axis label
+      y_label.attr("x", -(height / 2)).attr('y', -50)
+        .style("text-anchor", "middle");
+
+      // based on the data bound to each svg rect,
+      // change its x, y, width, height accordingly
+      d3.selectAll('.circle')
+          .attr('cx', function(d) {
+              return measure_scale_x(+d[xfield]);
+          })
+          .attr('cy', function(d) {
+              return measure_scale(+d[yfield]);
+          })
+          .attr('r', 7);
+
+      debugger;
+      //******************************
+      // SELECTION ACTIONS
+      //******************************
+
+
+      //when group is selected
+      d3.select("#dgroup")
+       	.on("click", function () {
+       		var yfield = 'avg_lon';
+    			var xfield = 'avg_lat';
+
+          if (butts2[0].selected) {
+            var var_color2 = 'avg_coll_enr_rate';
+            var var_text2 = 'Average College Enrollment Rate:';
+            var color2 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);
+            var percent = '%';
+          } else if (butts2[1].selected) {
+            var var_color2 = 'avg_att_rate';
+            var var_text2 = 'Average Attendance Rate:';
+            var color2 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);    
+            var percent = '%';
+          } else if (butts2[2].selected) {
+            var var_color2 = 'avg_teach_att_rate';
+            var var_text2 = 'Average Teacher Attendance Rate:';
+            var color2 = d3.scale.linear().domain([0, 1,92, 95, 98]).range(['black','red','red','white','green']);  
+            var percent = '%'; 
+          } else if (butts2[3].selected) {
+            var var_color2 = 'avg_grad_rate';
+            var var_text2 = 'Average Graduation Rate:';
+            var color2 = d3.scale.linear().domain([0, 1,50, 75, 90]).range(['black','red','red','white','green']);   
+            var percent = '%';
+          } else if (butts2[4].selected) {
+            var var_color2 = 'avg_susp_rate';
+            var var_text2 = 'Average Suspension Rate (per 100 students):';
+            var color2 = d3.scale.linear().domain([0,.01,.01, 60, 120]).range(['black','green','green','white','red']);
+            var percent = ' ';
+          } else if (butts2[5].selected) {
+            var var_color2 = 'avg_act_scores';
+            var var_text2 = 'Average ACT Score:';
+            var color2 = d3.scale.linear().domain([14, 18,30]).range(['red','white','green']);    
+            var percent = ' ';
+          }
+
+
+          var color_group = function(d) { return d[var_color2];};
+
+          svg.selectAll(".circle")
+                  .data(data)  // Update with new data
+                  .on("mouseover", function (d) {
+                    tooltip.transition()
+                      .duration(200)
+                      .style("opacity", 1);
+              tooltip.html("<font color='blue'>Zip Code:</font><br>" + d["zipcode"] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + percent)
+                .style("left", width + 125  + "px")
+                .style("top", height - 250 + 'px');
+            })
+                  .on("mouseout", function(d) {
+                    tooltip.transition()
+                      .duration(500)
+                      .style("opacity",0);
+                  })
+                  .transition()  // Transition from old to new
+                  .duration(1000)  // Length of animation
+                  .each("start", function() {  // Start animation
+                      d3.select(this)  // 'this' means the current element
+                          .style("fill", "red")  // Change color
+                          .attr("r", 5);  // Change size
+                  })
+                  .delay(function(d, i) {
+                      return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+                  })
+                  //.ease("linear")  // Transition easing - default 'variable' (i.e. has acceleration), also: 'circle', 'elastic', 'bounce', 'linear'
+                  .attr("cx", function(d) {
+                      return measure_scale_x(+d[xfield]);  // Circle's X
+                  })
+                  .attr("cy", function(d) {
+                      return measure_scale(+d[yfield]);  // Circle's Y
+                  })
+                  .each("end", function() {  // End animation
+                      d3.select(this)  // 'this' means the current element
+                          .transition()
+                          .duration(500)
+                          .style("fill", function(d) { return color2(color_group(d));}) 
+                          .attr("r", function(d) { return d.total*3;});  // Change radius
+                  });
+          update('group');
+       	});   
+
+      // When individual is selected
+      d3.select("#dindividualize")
+       	.on("click", function () {
+       		var yfield = 'lon';
+    		  var xfield = 'lat';
+
+          if (butts2[0].selected) {
+            var var_color2 = 'coll_enr';
+            var var_text2 = 'College Enrollment Rate:';
+            var color2 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);  
+            var percent = '%';
+ 
+          } else if (butts2[1].selected) {
+            var var_color2 = 'att_rate';
+            var var_text2 = 'Attendance Rate:';
+            var color2 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);   
+                        var percent = '%';
+          } else if (butts2[2].selected) {
+            var var_color2 = 'teach_att';
+            var var_text2 = 'Average Teacher Attendance Rate:';
+            var color2 = d3.scale.linear().domain([0,1, 92, 95, 98]).range(['black','red','red','white','green']);  
+                        var percent = '%';
+ 
+          } else if (butts2[3].selected) {
+            var var_color2 = 'grad_rate';
+            var var_text2 = 'Graduation Rate:';
+                        var percent = '%';
+
+            var color2 = d3.scale.linear().domain([0, 1,50, 75, 90]).range(['black','red','red','white','green']);   
+          } else if (butts2[4].selected) {
+            var var_color2 = 'susp_rate13';
+            var var_text2 = 'Suspension Rate (per 100 students):';
+            var color2 = d3.scale.linear().domain([0,.01,.01, 60, 120]).range(['black','green','green','white','red']);
+            var percent = ' ';
+          } else if (butts2[5].selected) {
+            var var_color2 = 'act_spr13_avg11';
+            var var_text2 = 'ACT Score:';
+            var color2 = d3.scale.linear().domain([14, 18,30]).range(['red','white','green']);    
+            var percent = ' ';
+          }
+
+          var color_individual2 = function(d) { return d[var_color2];};
+
+          svg.selectAll(".circle")
+            .data(data)  // Update with new data
+            .on("mouseover", function (d) {
+              tooltip.transition()
+                .duration(200)
+                .style("opacity", 1);
+              tooltip.html("<font color='blue'>School:</font><br>" + d['school'] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + "%")
+                .style("left", width + 125  + "px")
+                .style("top", height - 250 + 'px');
+                 // d3.select(this).attr("r", 10).style("fill", "red"); #hoveering action!
+            })
+            .on("mouseout", function(d) {
+              tooltip.transition()
+                .duration(500)
+                .style("opacity",0);
+
+            })
+            .transition()  // Transition from old to new
+            .duration(1000)  // Length of animation
+            .each("start", function() {  // Start animation
+                d3.select(this)  // 'this' means the current element
+                    .style("fill", "red")  // Change color
+                    .attr("r", 7);  // Change size
+            })
+            .delay(function(d, i) {
+                return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+            })
+            .attr("cx", function(d) {
+                return measure_scale_x(+d[xfield]);  // Circle's X
+            })
+            .attr("cy", function(d) {
+                return measure_scale(+d[yfield]);  // Circle's Y
+            })
+            .each("end", function() {  // End animation
+                d3.select(this)  // 'this' means the current element
+                    .transition()
+                    .duration(500)
+                    .style("fill", function(d) { return color2(color_individual2(d));}) 
+                    .attr("r", 7);  // Change radius
+                  });
+          update('individualize');
+       	});   
+
+      // When college_enrollment is selected
+      d3.select("#dcollege_enrollment")
+        .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'coll_enr';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "College Enrollment Rate:";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_coll_enr_rate';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average College Enrollment Rate:";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+          color3 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);
+
+        svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + "%")
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+
+          update2('college_enrollment');
+        }
+        );
+       
+      // When attendance is selected
+      d3.select("#dattendance")
+      .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'att_rate';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "Attendance Rate:";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_att_rate';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average Attendance Rate:";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+          color3 = d3.scale.linear().domain([50, 75, 90]).range(['red','white','green']);
+        svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + "%")
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+        update2('attendance');
+      });
+
+      // When teacher attendance is selected
+      d3.select("#dteacher_attendance")
+      .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'teach_att';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "Teacher's Attendance Rate:";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_teach_att_rate';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average Teacher's Attendance Rate:";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+          color3 = d3.scale.linear().domain([0,1, 92, 95, 98]).range(['black','red','red','white','green']);           svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + "%")
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+        update2('teacher_attendance');
+      });
+
+      // When  graduation is selected
+      d3.select("#dgraduation")
+      .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'grad_rate';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "Graduation Rate:";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_grad_rate';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average Graduation Rate:";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+          color3 = d3.scale.linear().domain([0, 1,50, 75, 90]).range(['black','red','red','white','green']);  
+          svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2] + "%")
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+        update2('graduation');
+      });
+
+      // When  suspension is selected
+      d3.select("#dsuspension")
+      .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'susp_rate13';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "Suspension Rate (per 100 students):";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_susp_rate';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average Suspension Rate (per 100 students):";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+            color3 = d3.scale.linear().domain([0,.01,.01, 60, 120]).range(['black','green','green','white','red']);
+          svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2])
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+        update2('suspension');
+      });
+
+      // When  ACT is selected
+      d3.select("#dACT")
+      .on("click", function () {
+        if (butts[0].selected) {
+          var var_color2 = 'act_spr13_avg11';
+          var circle_size = 7;
+          var text_type = 'school';
+          var var_text1 = 'School:';
+          var var_text2 = "ACT Score:";
+        } else if (butts[1].selected) {
+          var var_color2 = 'avg_act_scores';
+          var circle_size = function(d) { return d.total*3;};
+          var text_type = 'zipcode';
+          var var_text1 = 'Zip Code:';
+          var var_text2 = "Average ACT Score:";
+        }
+
+        var color_individual3 = function(d) { return d[var_color2];},
+            color3 = d3.scale.linear().domain([14, 18,30]).range(['red','white','green']);    
+          svg.selectAll(".circle")
+          .data(data)
+          .on("mouseover", function (d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", 1);
+            tooltip.html("<font color='blue'>" + var_text1 + "</font><br>" + d[text_type] + "<br><br><font color='blue'>"+var_text2+"</font><br>" + d[var_color2])
+              .style("left", width + 125  + "px")
+              .style("top", height - 250 + 'px');
+            })
+          .transition()  // Transition from old to new
+          .duration(200)  // Length of animation
+          .delay(function(d, i) {
+              return i / data.length * 500;  // Dynamic delay (i.e. each item delays a little longer)
+          })
+          .each("end", function() {  // End animation
+            d3.select(this)  // 'this' means the current element
+              .transition()
+              .duration(500)
+              .style("fill", function(d) { return color3(color_individual3(d));}) 
+              .attr("r", circle_size);  // Change radius
+          });
+
+        update2('ACT');
+      });
+
+    }; //ENDS DRAW FUNCTION
+    </script>
+  </head>
+  <body>
+    <script type="text/javascript">
+    // load our data file asynchronously and pass the data
+    // to the draw function once it is loaded.
+    d3.csv("lat_lon_records_expanded.csv", draw);
+    </script>
+  </body>
+</html>
