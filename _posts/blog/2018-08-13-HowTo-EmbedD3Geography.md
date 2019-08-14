@@ -58,7 +58,9 @@ This will allow you to get a visual view of the index file you placed in your gi
 you do minor changes directly to your gist.
 
 
-### Step 5: get embedding of gist
+### Step 5: get embedding of gist (deprecated)
+
+**RAWGIT is going offline in October 2019**
 
 From the gist, click on **Raw** for the index file. Copy the url. in this case it would be:
 <font color="blue">https://gist.githubusercontent.com/vincentpham1991/bdde5f0ad54449717bacbf75b6eeee96/raw/47c6095c9085cc99d6dbbc7e7887ace1b004abb9/index.html</font>
@@ -72,7 +74,7 @@ This will give you links that you can use to post d3 on your Github page. Choose
 production url: <font color="blue">https://cdn.rawgit.com/vincentpham1991/bdde5f0ad54449717bacbf75b6eeee96/raw/47c6095c9085cc99d6dbbc7e7887ace1b004abb9/index.html</font>
 development url: <font color="blue">https://rawgit.com/vincentpham1991/bdde5f0ad54449717bacbf75b6eeee96/raw/47c6095c9085cc99d6dbbc7e7887ace1b004abb9/index.html</font>
 
-### Step 6: Embed link into Github page
+### Step 6: Embed link into Github page (deprecated)
 
 This step may be different depending on the method you use to create your Github page. But for me, I can host it by using this line: 
 
