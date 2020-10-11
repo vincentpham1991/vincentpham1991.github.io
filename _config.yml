@@ -19,7 +19,7 @@ locale: en-US
 title: "Vincent Pham"
 description: "Data Scientist"
 baseurl: # the subpath of your site, e.g. "/blog"
-url: http://vincentpham1991.github.io
+url: https://vincentpham1991.github.io
 # url: http://localhost:4000
 logo: /images/site-logo-v3.png
 logo2: /images/msan-student-vincent-pham.jpg
