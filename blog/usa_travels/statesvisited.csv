@@ -2,7 +2,7 @@ state,visited
 Alabama,0
 Alaska,0
 Arkansas,0
-Arizona,0
+Arizona,1
 California,1
 Colorado,1
 Connecticut,0
@@ -19,7 +19,7 @@ Kentucky,1
 Louisiana,1
 Maine,0
 Maryland,1
-Massachusetts,0
+Massachusetts,1
 Michigan,1
 Minnesota,1
 Missouri,1
@@ -42,7 +42,7 @@ South Carolina,1
 South Dakota,1
 Tennessee,1
 Texas,1
-Utah,0
+Utah,1
 Virginia,1
 Vermont,0
 Washington,1
